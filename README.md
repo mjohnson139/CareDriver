@@ -60,7 +60,7 @@ The project is organized into Swift packages for modularity, testability, and re
 ### Project Usage
 
 1. **Running the Project**:
-   - Open in Xcode and run on a simulator or device. The initial screen displays trips fetched from the mock API client.
+   - Open the CareDriver.xcworkspace file in Xcode.  Select the iOS scheme and run on a simulator or device. The initial screen displays trips fetched from the mock API client.
 
 2. **Testing**:
    - Unit tests for various components can be run using the Xcode test navigator, focusing on API interactions and model serialization.
