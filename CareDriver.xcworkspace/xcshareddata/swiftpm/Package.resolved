@@ -1,0 +1,15 @@
+{
+  "originHash" : "4f36e5681d6ee109080de2bc33ed5677a042837baf6c0a7c90f1fb51acbae31e",
+  "pins" : [
+    {
+      "identity" : "snapkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SnapKit/SnapKit.git",
+      "state" : {
+        "revision" : "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
+        "version" : "5.7.1"
+      }
+    }
+  ],
+  "version" : 3
+}
