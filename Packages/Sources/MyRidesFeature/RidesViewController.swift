@@ -9,6 +9,7 @@ public class RidesTableViewController: UITableViewController {
   private let viewModel: RidesViewModel
   private let cellIdentifier = "TripTableViewCell"
   private var activityIndicator: UIActivityIndicatorView!
+  private var loadTask: Task<Void, Never>? = nil
 
   /// Initializes a new instance of RidesTableViewController.
   ///
@@ -49,12 +50,18 @@ public class RidesTableViewController: UITableViewController {
     }
 
     // Load the trips and reload the table view
-    Task { [weak self] in
+    loadTask = Task { [weak self] in
       if Task.isCancelled {
         return
       }
       await self?.loadData()
     }
+  }
+
+  override public func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    // Cancel the load task when the view controller is about to disappear
+    loadTask?.cancel()
   }
 
   private func configureNavigationBar() {
@@ -91,13 +98,11 @@ public class RidesTableViewController: UITableViewController {
       hideLoadingIndicator()
     }
 
-    do {
-      await viewModel.loadTrips()
-      if Task.isCancelled {
-        return
-      }
-      tableView.reloadData()
+    await viewModel.loadTrips()
+    if Task.isCancelled {
+      return
     }
+    tableView.reloadData()
   }
 
   private func showLoadingIndicator() {

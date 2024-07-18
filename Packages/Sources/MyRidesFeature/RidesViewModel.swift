@@ -19,29 +19,17 @@ public class RidesViewModel: ObservableObject {
   public func loadTrips() async {
     do {
       let trips = try await apiClient.fetchTrips()
-      if Task.isCancelled {
-        return
-      }
+      try Task.checkCancellation()
       groupTrips(trips: trips)
+    } catch is CancellationError {
+      return
     } catch ApiError.networkError(_) {
-      if Task.isCancelled {
-        return
-      }
       onError?("Network error: Please check your internet connection.")
     } catch ApiError.invalidResponse {
-      if Task.isCancelled {
-        return
-      }
       onError?("Server error: Received an invalid response.")
     } catch ApiError.decodingError {
-      if Task.isCancelled {
-        return
-      }
       onError?("Data error: Unable to process the received data.")
     } catch {
-      if Task.isCancelled {
-        return
-      }
       onError?("Unexpected error: Please try again later.")
     }
   }
@@ -51,13 +39,12 @@ public class RidesViewModel: ObservableObject {
     let dateFormatter = DateFormatter.sectionGroupFormatter
 
     // Group trips by the date key
-    let groupedTrips = Dictionary(grouping: trips) { trip in
+    tripGroups = Dictionary(grouping: trips) { trip in
       dateFormatter.string(from: trip.plannedRoute.startsAt)
     }
-
-    // Create TripGroup objects for each group
-    tripGroups = groupedTrips.keys.sorted().map { key in
-      TripGroup(dateKey: key, trips: groupedTrips[key]!)
+    .sorted(by: { $0.key < $1.key })
+    .map { key, trips in
+      TripGroup(dateKey: key, trips: trips)
     }
   }
 
