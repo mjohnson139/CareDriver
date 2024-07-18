@@ -98,13 +98,11 @@ public class RidesTableViewController: UITableViewController {
       hideLoadingIndicator()
     }
 
-    do {
-      await viewModel.loadTrips()
-      if Task.isCancelled {
-        return
-      }
-      tableView.reloadData()
+    await viewModel.loadTrips()
+    if Task.isCancelled {
+      return
     }
+    tableView.reloadData()
   }
 
   private func showLoadingIndicator() {

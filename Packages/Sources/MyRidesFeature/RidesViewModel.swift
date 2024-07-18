@@ -19,29 +19,17 @@ public class RidesViewModel: ObservableObject {
   public func loadTrips() async {
     do {
       let trips = try await apiClient.fetchTrips()
-      if Task.isCancelled {
-        return
-      }
+      try Task.checkCancellation()
       groupTrips(trips: trips)
+    } catch is CancellationError {
+      return
     } catch ApiError.networkError(_) {
-      if Task.isCancelled {
-        return
-      }
       onError?("Network error: Please check your internet connection.")
     } catch ApiError.invalidResponse {
-      if Task.isCancelled {
-        return
-      }
       onError?("Server error: Received an invalid response.")
     } catch ApiError.decodingError {
-      if Task.isCancelled {
-        return
-      }
       onError?("Data error: Unable to process the received data.")
     } catch {
-      if Task.isCancelled {
-        return
-      }
       onError?("Unexpected error: Please try again later.")
     }
   }
