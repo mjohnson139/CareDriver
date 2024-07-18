@@ -1,6 +1,34 @@
 import Foundation
 import Models
 
+/// An enumeration of possible API errors.
+public enum ApiError: LocalizedError {
+  /// An error indicating a network error occurred.
+  case networkError(underlyingError: Error)
+  /// An error indicating an invalid response from the server.
+  case invalidResponse
+  /// An error indicating that decoding the response data failed.
+  case decodingError
+
+  /// A localized description of the error.
+  public var errorDescription: String? {
+    switch self {
+    case let .networkError(underlyingError):
+      "Network error: \(underlyingError.localizedDescription)"
+    case .invalidResponse:
+      "Invalid response from the server."
+    case .decodingError:
+      "Failed to decode the data."
+    }
+  }
+}
+
+/// An enumeration of API endpoints.
+public enum ApiEndpoints {
+  /// The URL for fetching trips.
+  public static let getTrips = URL(string: "https://hopskipdrive-static-files.s3.us-east-2.amazonaws.com/interview-resources/Trip.json")!
+}
+
 /// A protocol defining the requirements for an API client that fetches trips.
 public protocol ApiClient: Sendable {
   /// Fetches trips asynchronously.
@@ -68,32 +96,4 @@ public struct MockFailingApiClient: ApiClient {
   public func fetchTrips() async throws -> [Trip] {
     throw errorToThrow
   }
-}
-
-/// An enumeration of possible API errors.
-public enum ApiError: LocalizedError {
-  /// An error indicating a network error occurred.
-  case networkError(underlyingError: Error)
-  /// An error indicating an invalid response from the server.
-  case invalidResponse
-  /// An error indicating that decoding the response data failed.
-  case decodingError
-
-  /// A localized description of the error.
-  public var errorDescription: String? {
-    switch self {
-    case let .networkError(underlyingError):
-      "Network error: \(underlyingError.localizedDescription)"
-    case .invalidResponse:
-      "Invalid response from the server."
-    case .decodingError:
-      "Failed to decode the data."
-    }
-  }
-}
-
-/// An enumeration of API endpoints.
-public enum ApiEndpoints {
-  /// The URL for fetching trips.
-  public static let getTrips = URL(string: "https://hopskipdrive-static-files.s3.us-east-2.amazonaws.com/interview-resources/Trip.json")!
 }
