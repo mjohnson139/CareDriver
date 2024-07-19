@@ -1,33 +1,34 @@
-# This file contains the fastlane.tools configuration
-# You can find the documentation at https://docs.fastlane.tools
-#
-# For a list of all available actions, check out
-#
-#     https://docs.fastlane.tools/actions
-#
-# For a list of all available plugins, check out
-#
-#     https://docs.fastlane.tools/plugins/available-plugins
-#
-
-# Uncomment the line if you want fastlane to automatically update itself
-# update_fastlane
-
-default_platform :ios
+default_platform(:ios)
 
 platform :ios do
-  before_all do
-    setup_circle_ci
+  desc "Build all Swift Packages"
+  lane :build_all_packages do
+    products = ["ApiClient", "ConfirmationAlert", "Models", "MyRidesFeature", "StyleSheet"]
+    products.each do |product|
+      sh "xcodebuild -scheme '#{product}' -destination 'generic/platform=iOS' clean build | xcpretty"
+    end
   end
 
-  desc "Runs all the tests"
-  lane :test do
-    scan
+  desc "Run Tests for all Swift Packages"
+  lane :run_all_tests do
+    products = ["ApiClient", "ConfirmationAlert", "Models", "MyRidesFeature", "StyleSheet"]
+    products.each do |product|
+      sh "xcodebuild -scheme '#{product}' -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' clean test | xcpretty"
+    end
   end
 
-  desc "Ad-hoc build"
-  lane :adhoc do
-    match(type: "adhoc")
-    gym(export_method: "ad-hoc")
+  desc "Generate Documentation for all Swift Packages"
+  lane :generate_all_docs do
+    products = ["ApiClient", "ConfirmationAlert", "Models", "MyRidesFeature", "StyleSheet"]
+    products.each do |product|
+      sh "xcodebuild docbuild -scheme '#{product}' -destination 'generic/platform=iOS' -derivedDataPath ./build/#{product} | xcpretty"
+    end
+  end
+
+  desc "Build, Test, and Generate Documentation for all Swift Packages"
+  lane :build_test_and_document_all do
+    build_all_packages
+    run_all_tests
+    generate_all_docs
   end
 end
